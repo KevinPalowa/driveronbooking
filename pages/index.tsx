@@ -1,43 +1,87 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
-import axios from "axios";
-import { setCookie } from "cookies-next";
+import Image from "next/image";
+import { getCookie, setCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import React, { FormEvent, useState } from "react";
+import React, { useEffect, useState } from "react";
+import Logo from "../public/img/logo.png";
+import { useForm } from "react-hook-form";
+import Head from "next/head";
+import axios, { AxiosError } from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { useUser } from "@/hooks/useUser";
+export type LoginBody = { email: string; password: string };
 
+async function doLogin({ email, password }: LoginBody) {
+  const data = await axios.post("api/auth/signin", { email, password });
+  return data.data;
+}
 export default function Login() {
+  const { handleSubmit: submit, control } = useForm<LoginBody>();
+  const { login, user } = useUser();
+  console.log(user);
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const loginData = await axios.post("/api/login", { email, password });
-    if (loginData.status === 200) {
-      setCookie("authToken", loginData.data.data.token);
-      router.push("/admin");
-    }
-    console.log(loginData);
+  const { mutate, error, isLoading, data } = useMutation<
+    any,
+    AxiosError<any>,
+    LoginBody
+  >(doLogin);
+  async function handleSubmit({ email, password }: LoginBody) {
+    mutate(
+      { email, password },
+      {
+        onSuccess: (res) => {
+          setCookie("token", res.data.token);
+          login(res.data);
+          router.push("/dashboard");
+        },
+      }
+    );
   }
   return (
-    <div className="bg-blue-400 w-full h-screen grid place-items-center">
+    <div className="bg-black w-full h-full grid place-items-center">
+      <Head>
+        <title>Login Page</title>
+      </Head>
+      <Image src={Logo} alt="logo" className="w-64 mx-auto" />
       <div className="p-10 bg-white rounded-lg w-5/12 space-y-5">
+        {error && (
+          <div className="text-red-500 bg-red-200 p-3 w-full">
+            {error?.response.data.meta.message}
+          </div>
+        )}
         <h1 className="font-bold text-xl text-center">
           Sign in to your account
         </h1>
         <p className="text-center">Please sign in to continue</p>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={submit(handleSubmit)}>
           <div className="space-y-1">
             <label className="block">Email</label>
-            <Input onChange={(e) => setEmail(e.target.value)} />
+            <Input
+              control={control}
+              name="email"
+              rules={{
+                required: "Email cannot be empty",
+                pattern: {
+                  value:
+                    /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/,
+                  message: "Please input a valid email",
+                },
+              }}
+            />
           </div>
           <div className="space-y-1 mt-3">
             <label className="block">Password</label>
             <Input
-              onChange={(e) => setPassword(e.target.value)}
               type="password"
+              control={control}
+              name="password"
+              rules={{ required: "Password cannot be empty" }}
             />
           </div>
-          <Button className="w-full">Login</Button>
+          <Button className="w-full" disabled={isLoading}>
+            {isLoading ? "Loading..." : "Login"}
+          </Button>
         </form>
       </div>
     </div>
