@@ -5,3 +5,13 @@ export type TResponseData<T> = {
   };
   data?: T;
 };
+
+export type TBrowseData<T> = {
+  meta: {
+    totalData: number;
+    totalPage: number;
+  };
+  data: [] | T;
+};
+
+export type Role = "admin" | "employee" | "driver";

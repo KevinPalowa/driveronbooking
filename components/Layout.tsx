@@ -1,25 +1,55 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { ReactNode, useMemo, useState } from "react";
+import React, { ReactNode, useState } from "react";
 import Image from "next/image";
 import { BsPeople } from "react-icons/bs";
 import { MdOutlineAltRoute } from "react-icons/md";
+import { RiSteering2Fill } from "react-icons/ri";
 import Logo from "../public/img/logo.png";
 import Head from "next/head";
 import { deleteCookie } from "cookies-next";
 import { useUser } from "@/hooks/useUser";
+import { AiOutlineDashboard } from "react-icons/ai";
+import { Role } from "@prisma/client";
 type Props = {
   children: ReactNode;
 };
+type Sidebar = {
+  icon: ReactNode;
+  href: string;
+  text: string;
+  role: Role[];
+};
 export default function Layout({ children }: Props) {
   const { user, logout } = useUser();
-  console.log(user);
   const router = useRouter();
-  const current_module = useMemo(
-    () => router.pathname.split("/")[2],
-    [router.pathname]
-  );
   const [show_sidebar, setShowSidebar] = useState(false);
+  const sidebars: Sidebar[] = [
+    {
+      icon: <AiOutlineDashboard size={24} className="mr-4" />,
+      href: "/dashboard",
+      text: "Dashboard",
+      role: ["admin", "driver", "employee"],
+    },
+    {
+      icon: <MdOutlineAltRoute size={24} className="mr-4" />,
+      href: "/route",
+      text: "Route",
+      role: ["admin"],
+    },
+    {
+      icon: <RiSteering2Fill size={24} className="mr-4" />,
+      href: "/driver",
+      text: "Driver",
+      role: ["admin"],
+    },
+    {
+      icon: <BsPeople size={24} className="mr-4" />,
+      href: "/employee",
+      text: "Employee",
+      role: ["admin"],
+    },
+  ];
   return (
     <div className="flex h-screen w-screen overflow-x-hidden text-[#292727]">
       <Head>
@@ -44,73 +74,37 @@ export default function Layout({ children }: Props) {
           x
         </button>
         <ul>
-          <li className="mb-4">
-            <Link legacyBehavior href="/admin">
-              <a
-                className={`flex items-center rounded-lg py-2 px-6 transition hover:font-semibold hover:opacity-100 ${
-                  current_module === "overview"
-                    ? "bg-farmatek-purple-200 text-white"
-                    : "bg-white"
-                }`}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="mr-4 h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                Dashboard
-              </a>
-            </Link>
-          </li>
-          <li className="mb-4">
-            <Link legacyBehavior href="/dashboard/order">
-              <a
-                className={`flex items-center rounded-lg py-2 px-6 transition hover:font-semibold hover:opacity-100 ${
-                  current_module === "order"
-                    ? "bg-farmatek-purple-200 text-white"
-                    : "bg-white"
-                }`}
-              >
-                <MdOutlineAltRoute size={24} className="mr-4" />
-                Destination
-              </a>
-            </Link>
-          </li>
-          <li className="mb-4">
-            <Link legacyBehavior href="/driver">
-              <a
-                className={`flex items-center rounded-lg py-2 px-6 transition hover:font-semibold hover:opacity-100 ${
-                  current_module === "product"
-                    ? "bg-farmatek-purple-200 text-white"
-                    : "bg-white"
-                }`}
-              >
-                <BsPeople size={24} className="mr-4" />
-                Driver
-              </a>
-            </Link>
-          </li>
+          {sidebars.map(
+            (sidebar, i) =>
+              sidebar.role.includes(user?.role) && (
+                <li className="mb-4" key={i}>
+                  <Link legacyBehavior href={sidebar.href}>
+                    <a
+                      className={`flex items-center rounded-lg py-2 px-6 transition hover:font-semibold hover:opacity-100 ${
+                        router.asPath === sidebar.href
+                          ? "bg-primary"
+                          : "bg-white"
+                      }`}
+                    >
+                      {sidebar.icon}
+                      {sidebar.text}
+                    </a>
+                  </Link>
+                </li>
+              )
+          )}
         </ul>
       </div>
       <div className="flex flex-grow flex-col overflow-hidden">
         <div className="flex w-full items-center justify-between bg-white py-5 px-9">
           <div className="">
-            <h3 className="mb-1 text-xl font-bold">Hello {user.name}!</h3>
+            <h3 className="mb-1 text-xl font-bold">Hello {user?.name}!</h3>
             {/* <p>{member.member_level.name}</p> */}
           </div>
           <div className="flex items-center">
             <span className="group relative cursor-pointer">
               <Image
-                src={`https://ui-avatars.com/api/?name=${user.name}&background=random&rounded=true`}
+                src={`https://ui-avatars.com/api/?name=${user?.name}&background=random&rounded=true`}
                 width={32}
                 height={32}
                 alt="Profile"
@@ -120,8 +114,8 @@ export default function Layout({ children }: Props) {
                 <button
                   className="whitespace-nowrap border bg-white py-2 px-4 text-sm"
                   onClick={() => {
-                    deleteCookie("token");
                     router.push("/");
+                    deleteCookie("token");
                     logout();
                   }}
                 >

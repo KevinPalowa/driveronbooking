@@ -1,12 +1,13 @@
 import Layout from "@/components/Layout";
+import React from "react";
 import UserList from "@/components/UserList";
 
-function Driver() {
+function Employee() {
   return (
     <Layout>
-      <UserList role="driver" />
+      <UserList role="employee" />
     </Layout>
   );
 }
 
-export default Driver;
+export default Employee;

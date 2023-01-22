@@ -10,6 +10,7 @@ import Head from "next/head";
 import axios, { AxiosError } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { useUser } from "@/hooks/useUser";
+import { ButtonSpinner, Spinner } from "@chakra-ui/react";
 export type LoginBody = { email: string; password: string };
 
 async function doLogin({ email, password }: LoginBody) {
@@ -19,7 +20,6 @@ async function doLogin({ email, password }: LoginBody) {
 export default function Login() {
   const { handleSubmit: submit, control } = useForm<LoginBody>();
   const { login, user } = useUser();
-  console.log(user);
   const router = useRouter();
   const { mutate, error, isLoading, data } = useMutation<
     any,
@@ -39,12 +39,12 @@ export default function Login() {
     );
   }
   return (
-    <div className="bg-black w-full h-full grid place-items-center">
+    <div className="bg-gray-900 w-full h-screen grid place-items-center">
       <Head>
         <title>Login Page</title>
       </Head>
       <Image src={Logo} alt="logo" className="w-64 mx-auto" />
-      <div className="p-10 bg-white rounded-lg w-5/12 space-y-5">
+      <div className="p-10 bg-white rounded-lg w-5/12 space-y-5 shadow-lg">
         {error && (
           <div className="text-red-500 bg-red-200 p-3 w-full">
             {error?.response.data.meta.message}
@@ -80,7 +80,7 @@ export default function Login() {
             />
           </div>
           <Button className="w-full" disabled={isLoading}>
-            {isLoading ? "Loading..." : "Login"}
+            {isLoading ? <Spinner /> : "Login"}
           </Button>
         </form>
       </div>

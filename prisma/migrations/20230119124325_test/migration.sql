@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Driver` MODIFY `dob` VARCHAR(191) NOT NULL;
