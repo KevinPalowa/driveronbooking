@@ -33,6 +33,12 @@ export default function Layout({ children }: Props) {
     },
     {
       icon: <MdOutlineAltRoute size={24} className="mr-4" />,
+      href: "/my-routes",
+      text: "My Routes",
+      role: ["employee"],
+    },
+    {
+      icon: <MdOutlineAltRoute size={24} className="mr-4" />,
       href: "/route",
       text: "Route",
       role: ["admin"],
@@ -76,7 +82,7 @@ export default function Layout({ children }: Props) {
         <ul>
           {sidebars.map(
             (sidebar, i) =>
-              sidebar.role.includes(user?.role) && (
+              sidebar.role.includes(user?.role!) && (
                 <li className="mb-4" key={i}>
                   <Link legacyBehavior href={sidebar.href}>
                     <a

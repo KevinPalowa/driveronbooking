@@ -22,7 +22,7 @@ export default function Request() {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { data } = useQuery({
     queryKey: ["routes"],
-    queryFn: () => getRoutes(),
+    queryFn: () => getRoutes({ size: 5, page: 2, search: "" }),
   });
   console.log(data);
   return (

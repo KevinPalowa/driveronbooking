@@ -47,7 +47,7 @@ export default function Login() {
       <div className="p-10 bg-white rounded-lg w-5/12 space-y-5 shadow-lg">
         {error && (
           <div className="text-red-500 bg-red-200 p-3 w-full">
-            {error?.response.data.meta.message}
+            {error?.response?.data.meta.message}
           </div>
         )}
         <h1 className="font-bold text-xl text-center">

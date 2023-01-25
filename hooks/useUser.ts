@@ -1,10 +1,10 @@
-import UserContext from "@/context/UserProvider";
-import React, { ReactNode } from "react";
-import { useState, useContext } from "react";
+import { userState } from "@/global/user";
+import { User } from "@prisma/client";
+import { useRecoilState } from "recoil";
 
 export function useUser() {
-  const { user, setUser } = useContext(UserContext);
-  function login(data) {
+  const [user, setUser] = useRecoilState(userState);
+  function login(data: User) {
     setUser(data);
   }
 

@@ -13,6 +13,21 @@ export default async function handler(
     const token = jwt.verify(authorization, process.env.JWT_SECRET!);
     if (token) {
       switch (req.method) {
+        case "PATCH":
+          const { email, name } = req.body;
+          const user = await prisma.user.findUnique({
+            where: { id: Number(id) },
+          });
+          if (user) {
+            const changedUser = await prisma.user.update({
+              where: { id: Number(id) },
+              data: { email, name },
+            });
+            res
+              .status(200)
+              .json({ data: changedUser, meta: { message: "Delete success" } });
+          }
+          break;
         case "DELETE":
           const driver = await prisma.user.delete({
             where: { id: Number(id) },

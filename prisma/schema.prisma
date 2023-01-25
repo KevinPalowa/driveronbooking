@@ -8,10 +8,11 @@ enum Gender {
 }
 
 enum Role {
-    admin
-    employee
-    driver
-  }
+  admin
+  employee
+  driver
+}
+
 datasource db {
   provider          = "mysql"
   url               = env("DATABASE_URL")
@@ -19,18 +20,31 @@ datasource db {
 }
 
 model User {
-  id       Int     @id @default(autoincrement())
-  email    String  @unique
-  name     String?
-  password String
-  role Role
+  id             Int         @id @default(autoincrement())
+  email          String      @unique
+  name           String?
+  password       String
+  role           Role
+  routes         Route[]
+  RouteRequested Passenger[]
 }
 
-
 model Route {
-  id            Int    @id @default(autoincrement())
+  id            Int         @id @default(autoincrement())
   destination   String
   estimation    String
   capacity      Int
   departureTime String
+  driverId      Int
+  User          User        @relation(fields: [driverId], references: [id])
+  passenger     Passenger[]
+}
+
+model Passenger {
+  id          Int   @id @default(autoincrement())
+  routeId     Int
+  passengerId Int
+  approved    Int   @default(0)
+  User        User  @relation(fields: [passengerId], references: [id])
+  Route       Route @relation(fields: [routeId], references: [id])
 }

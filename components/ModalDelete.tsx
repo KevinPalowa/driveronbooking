@@ -1,4 +1,3 @@
-import { deleteDriver } from "@/api/product";
 import {
   Modal,
   ModalOverlay,
@@ -10,7 +9,15 @@ import {
   Button,
   useToast,
 } from "@chakra-ui/react";
-import { useQueryClient } from "@tanstack/react-query";
+
+type Props = {
+  isOpen: boolean;
+  onOpen: () => void;
+  onClose: () => void;
+  id: number;
+  name: string;
+  handleDelete: (id: number) => void;
+};
 export default function ModalDelete({
   isOpen,
   onOpen,
@@ -18,7 +25,7 @@ export default function ModalDelete({
   id,
   name,
   handleDelete,
-}) {
+}: Props) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />

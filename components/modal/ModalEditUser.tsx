@@ -1,4 +1,4 @@
-import { AddUserBody } from "@/api/user";
+import { UserResponse } from "@/types/user";
 import {
   Button,
   Input,
@@ -10,8 +10,6 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  InputGroup,
-  InputRightElement,
   SimpleGrid,
   useToast,
 } from "@chakra-ui/react";
@@ -20,20 +18,23 @@ import { AxiosError } from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-type FormValue = { email: string; name: string; password: string };
+type FormValue = { email: string; name: string };
+
 type Props = {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
-  addFunction: (params: AddUserBody) => Promise<any>;
+  editFunction: (params: any) => Promise<any>;
   name: string;
+  dataToEdit: UserResponse;
 };
-export default function ModalAddDriver({
+export default function ModalEditDriver({
   isOpen,
   onOpen,
   onClose,
-  addFunction,
+  editFunction,
   name,
+  dataToEdit,
 }: Props) {
   const [show, setShow] = useState(false);
   const queryClient = useQueryClient();
@@ -41,16 +42,17 @@ export default function ModalAddDriver({
     register,
     handleSubmit: submit,
     formState: { errors },
-  } = useForm<FormValue>();
+  } = useForm<FormValue>({
+    values: { name: dataToEdit?.name, email: dataToEdit?.email },
+  });
 
   const toast = useToast({ position: "top-right", isClosable: true });
 
-  const { mutate, error, isLoading, data } = useMutation<
-    any,
-    AxiosError<any>,
-    any
-  >(addFunction);
+  const { mutate } = useMutation<any, AxiosError<any>, FormValue>((e) =>
+    editFunction({ ...e, id: dataToEdit.id })
+  );
   const handleSubmit = (e: any) => {
+    console.log(e);
     mutate(
       { ...e, role: name },
       {
@@ -60,7 +62,7 @@ export default function ModalAddDriver({
 
           toast({
             title: `${name} Added`,
-            description: `Successfully add ${name}`,
+            description: `Successfully edit ${name}`,
             status: "success",
           });
         },
@@ -76,37 +78,17 @@ export default function ModalAddDriver({
         <ModalOverlay />
         <form onSubmit={submit(handleSubmit)}>
           <ModalContent>
-            <ModalHeader>Add Employee</ModalHeader>
+            <ModalHeader>Edit {name}</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <SimpleGrid columns={1} spacingY={"2"}>
                 <SimpleGrid columns={2}>
                   <Text>Email</Text>
-                  <Input type="email" width="full" {...register("email")} />
+                  <Input type="email" {...register("email")} />
                 </SimpleGrid>
                 <SimpleGrid columns={2}>
                   <Text>Name</Text>
                   <Input {...register("name")} />
-                </SimpleGrid>
-                <SimpleGrid columns={2}>
-                  <Text>Password</Text>
-                  <InputGroup size="md">
-                    <Input
-                      pr="4.5rem"
-                      type={show ? "text" : "password"}
-                      placeholder="Enter password"
-                      {...register("password")}
-                    />
-                    <InputRightElement width="4.5rem">
-                      <Button
-                        h="1.75rem"
-                        size="sm"
-                        onClick={() => setShow(!show)}
-                      >
-                        {show ? "Hide" : "Show"}
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup>
                 </SimpleGrid>
               </SimpleGrid>
             </ModalBody>

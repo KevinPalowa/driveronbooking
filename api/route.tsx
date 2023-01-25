@@ -1,11 +1,10 @@
 import { api } from "@/lib/axios";
 import { TBrowseData } from "@/types/global";
-import { RouteResponse } from "@/types/route";
+import { AddRouteBody, RouteResponse } from "@/types/route";
 
-type AddRouteBody = { email: string; name: string; password: string };
 type Props = { search?: string; size?: number; page?: number };
-export const addRoute = async ({ email, name, password }: AddRouteBody) => {
-  const data = await api.post("api/route", { email, password, name });
+export const addRoute = async (params: AddRouteBody) => {
+  const data = await api.post("api/route", { ...params });
   return data.data;
 };
 
@@ -22,7 +21,14 @@ export const getRoutes = async ({
   const data = await api.get(
     `/api/route?search=${search}&size=${size}&page=${page}`
   );
-  console.log(data);
+
+  return data.data;
+};
+
+export const getMyRoutes = async (
+  id: number
+): Promise<TBrowseData<RouteResponse[]>> => {
+  const data = await api.get(`/api/route/${id}`);
 
   return data.data;
 };

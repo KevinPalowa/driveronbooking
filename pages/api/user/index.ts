@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
+import { Role } from "@/types/global";
 
 export default async function handler(
   req: NextApiRequest,
@@ -20,7 +21,7 @@ export default async function handler(
           const pageSize = Number(req.query.size) || 10;
           const totalData = await prisma.user.count({
             where: {
-              role: role,
+              role: role as Role,
               OR: [
                 { name: { contains: search as string } },
                 { email: { contains: search as string } },
@@ -32,7 +33,7 @@ export default async function handler(
             skip: (page - 1) * pageSize,
             take: pageSize,
             where: {
-              role: role,
+              role: role as Role,
               OR: [
                 { name: { contains: search as string } },
                 { email: { contains: search as string } },

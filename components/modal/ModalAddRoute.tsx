@@ -1,4 +1,5 @@
-import { AddUserBody } from "@/api/user";
+import { getUser } from "@/api/user";
+import { AddRouteBody } from "@/types/route";
 import {
   Button,
   Input,
@@ -10,57 +11,66 @@ import {
   ModalHeader,
   ModalOverlay,
   Text,
-  InputGroup,
-  InputRightElement,
   SimpleGrid,
   useToast,
+  Select,
 } from "@chakra-ui/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-type FormValue = { email: string; name: string; password: string };
 type Props = {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
-  addFunction: (params: AddUserBody) => Promise<any>;
-  name: string;
+  addFunction: (params: AddRouteBody) => Promise<any>;
 };
-export default function ModalAddDriver({
+export default function ModalAddRoute({
   isOpen,
   onOpen,
   onClose,
   addFunction,
-  name,
 }: Props) {
-  const [show, setShow] = useState(false);
   const queryClient = useQueryClient();
   const {
     register,
     handleSubmit: submit,
     formState: { errors },
-  } = useForm<FormValue>();
+    reset,
+  } = useForm<AddRouteBody>();
+  const { data: dataDriver } = useQuery({
+    queryKey: ["driver"],
+    keepPreviousData: true,
+    queryFn: () =>
+      getUser({
+        search: "",
+        page: 1,
+        size: 999999,
+        role: "driver",
+      }),
+  });
 
   const toast = useToast({ position: "top-right", isClosable: true });
 
   const { mutate, error, isLoading, data } = useMutation<
     any,
     AxiosError<any>,
-    any
+    AddRouteBody
   >(addFunction);
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: AddRouteBody) => {
+    console.log(e);
     mutate(
-      { ...e, role: name },
+      { ...e },
       {
         onSuccess: () => {
-          queryClient.invalidateQueries({ queryKey: [name] });
+          reset();
+          queryClient.invalidateQueries({ queryKey: ["route"] });
           onClose();
 
           toast({
-            title: `${name} Added`,
-            description: `Successfully add ${name}`,
+            title: `Route Added`,
+            description: `Successfully add route`,
             status: "success",
           });
         },
@@ -81,32 +91,30 @@ export default function ModalAddDriver({
             <ModalBody>
               <SimpleGrid columns={1} spacingY={"2"}>
                 <SimpleGrid columns={2}>
-                  <Text>Email</Text>
-                  <Input type="email" width="full" {...register("email")} />
+                  <Text>Destination</Text>
+                  <Input {...register("destination")} />
                 </SimpleGrid>
                 <SimpleGrid columns={2}>
-                  <Text>Name</Text>
-                  <Input {...register("name")} />
+                  <Text>Time</Text>
+                  <Input type="time" {...register("departureTime")} />
                 </SimpleGrid>
                 <SimpleGrid columns={2}>
-                  <Text>Password</Text>
-                  <InputGroup size="md">
-                    <Input
-                      pr="4.5rem"
-                      type={show ? "text" : "password"}
-                      placeholder="Enter password"
-                      {...register("password")}
-                    />
-                    <InputRightElement width="4.5rem">
-                      <Button
-                        h="1.75rem"
-                        size="sm"
-                        onClick={() => setShow(!show)}
-                      >
-                        {show ? "Hide" : "Show"}
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup>
+                  <Text>Capacity</Text>
+                  <Input type="number" {...register("capacity")} />
+                </SimpleGrid>
+                <SimpleGrid columns={2}>
+                  <Text>Estimation</Text>
+                  <Input {...register("estimation")} />
+                </SimpleGrid>
+                <SimpleGrid columns={2}>
+                  <Text>Driver</Text>
+                  <Select {...register("driverId")}>
+                    {dataDriver?.data.map((e) => (
+                      <option key={e.id} value={e.id}>
+                        {e.name}
+                      </option>
+                    ))}
+                  </Select>
                 </SimpleGrid>
               </SimpleGrid>
             </ModalBody>

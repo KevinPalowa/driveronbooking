@@ -1,8 +1,8 @@
 import { api } from "@/lib/axios";
 import { Role, TBrowseData } from "@/types/global";
-import { UserResponse } from "@/types/user";
+import { UserResponse, UserEditParams } from "@/types/user";
 
-type AddUserBody = {
+export type AddUserBody = {
   email: string;
   name: string;
   password: string;
@@ -18,6 +18,14 @@ type Params = {
 export const addUser = async ({ email, name, password, role }: AddUserBody) => {
   const data = await api.post("api/user", { email, password, name, role });
   return data.data;
+};
+
+export const editUser = async (data: UserEditParams) => {
+  const response = await api.patch(`api/user/${data.id}`, {
+    email: data.email,
+    name: data.name,
+  });
+  return response.data;
 };
 
 export const deleteUser = async (id: number | string) => {

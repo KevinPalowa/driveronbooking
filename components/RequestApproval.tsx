@@ -1,4 +1,6 @@
+import { api } from "@/lib/axios";
 import {
+  Spinner,
   Table,
   TableContainer,
   Tbody,
@@ -7,11 +9,26 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AxiosError } from "axios";
+import { useState } from "react";
 import { AiOutlineCheck, AiOutlineClose } from "react-icons/ai";
 export default function RequestApproval() {
-  const data = [
-    { id: "2", name: "Ucup sakucup", destination: "Neraka jahanam" },
-  ];
+  const [idToApprove, setIdToApprove] = useState();
+  const queryClient = useQueryClient();
+  const { data, isLoading, isError, isSuccess } = useQuery({
+    queryKey: ["request"],
+    keepPreviousData: true,
+    queryFn: async () => {
+      const data = await api.get("api/request");
+      return data.data;
+    },
+  });
+  const { mutate, isLoading: isLoadingApproval } = useMutation<
+    any,
+    AxiosError<any>,
+    any
+  >((e) => api.patch("api/request/approval", e));
   return (
     <>
       <h1 className="text-xl font-bold text-farmatek-black mb-5">
@@ -22,20 +39,62 @@ export default function RequestApproval() {
           <Thead>
             <Tr>
               <Th>Destination</Th>
-              <Th>Email</Th>
               <Th>Request by</Th>
               <Th>Action</Th>
             </Tr>
           </Thead>
           <Tbody>
-            {data?.map((e) => (
+            {data?.data?.map((e: any) => (
               <Tr key={e.id}>
-                <Td>{e.name}</Td>
-                <Td>{e.destination}</Td>
-                <Td>{e.name}</Td>
+                <Td>{e.Route.destination}</Td>
+                <Td>{e.User.name}</Td>
                 <Td className="flex">
-                  <AiOutlineCheck size={20} color="green" />
-                  <AiOutlineClose size={20} color="red" />
+                  {isLoadingApproval && idToApprove === e.id ? (
+                    <Spinner size="xs" />
+                  ) : e.approved === 0 ? (
+                    <>
+                      <AiOutlineCheck
+                        size={20}
+                        color="green"
+                        onClick={() => {
+                          setIdToApprove(e.id);
+                          mutate(
+                            { requestId: e.id, action: "approve" },
+                            {
+                              onSuccess: () => {
+                                queryClient.invalidateQueries(["request"]);
+                              },
+                            }
+                          );
+                        }}
+                      />
+                      <AiOutlineClose
+                        size={20}
+                        color="red"
+                        onClick={() => {
+                          setIdToApprove(e.id);
+                          mutate(
+                            { requestId: e.id, action: "reject" },
+                            {
+                              onSuccess: () => {
+                                queryClient.invalidateQueries(["request"]);
+                              },
+                            }
+                          );
+                        }}
+                      />
+                    </>
+                  ) : e.approved === 1 ? (
+                    <div className="bg-green-500 rounded-lg p-2 text-white font-bold">
+                      Approved
+                    </div>
+                  ) : (
+                    e.approved === 2 && (
+                      <div className="bg-red-500 rounded-lg p-2 text-white font-bold">
+                        Rejected
+                      </div>
+                    )
+                  )}
                 </Td>
               </Tr>
             ))}
