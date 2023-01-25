@@ -14,10 +14,7 @@ import { ButtonSpinner, Spinner } from "@chakra-ui/react";
 export type LoginBody = { email: string; password: string };
 
 async function doLogin({ email, password }: LoginBody) {
-  const data = await axios.post("api/authentication/signin", {
-    email,
-    password,
-  });
+  const data = await axios.post("api/auth/login", { email, password });
   return data.data;
 }
 export default function Login() {
