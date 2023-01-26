@@ -36,7 +36,7 @@ model Route {
   capacity      Int
   departureTime String
   driverId      Int
-  User          User        @relation(fields: [driverId], references: [id])
+  User          User        @relation(fields: [driverId], references: [id], onDelete: Cascade)
   passenger     Passenger[]
 }
 
@@ -45,6 +45,6 @@ model Passenger {
   routeId     Int
   passengerId Int
   approved    Int   @default(0)
-  User        User  @relation(fields: [passengerId], references: [id])
-  Route       Route @relation(fields: [routeId], references: [id])
+  User        User  @relation(fields: [passengerId], references: [id], onDelete: Cascade)
+  Route       Route @relation(fields: [routeId], references: [id], onDelete: Cascade)
 }

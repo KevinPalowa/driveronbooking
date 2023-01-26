@@ -44,7 +44,7 @@ export default function MyRoutes() {
               <Th>Departure Time</Th>
               <Th>Capacity</Th>
               <Th>Estimation</Th>
-              {false && (
+              {user?.role === "employee" && (
                 <>
                   <Th>Driver</Th>
                   <Th>Status</Th>
