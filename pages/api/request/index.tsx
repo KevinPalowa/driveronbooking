@@ -35,7 +35,8 @@ export default async function handler(
               .status(400)
               .json({ meta: "Passenger is already on the route" });
           }
-          if (currentPassengerCount <= route!.capacity) {
+          console.log(currentPassengerCount, route?.capacity);
+          if (currentPassengerCount < route!.capacity) {
             const driver = await prisma.passenger.create({
               data: { routeId, passengerId },
             });
