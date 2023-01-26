@@ -25,10 +25,15 @@ export const getRoutes = async ({
   return data.data;
 };
 
-export const getMyRoutes = async (
-  id: number
-): Promise<TBrowseData<RouteResponse[]>> => {
-  const data = await api.get(`/api/route/${id}`);
+export const getMyRoutes = async ({
+  search = "",
+  size = 5,
+  page = 1,
+  id = Number(),
+}): Promise<TBrowseData<RouteResponse[]>> => {
+  const data = await api.get(
+    `/api/route/${id}?search=${search}&size=${size}&page=${page}`
+  );
 
   return data.data;
 };

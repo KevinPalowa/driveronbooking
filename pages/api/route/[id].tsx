@@ -19,12 +19,27 @@ export default async function handler(
             // @ts-ignore: Unreachable code error
             where: { id: token.userId },
           });
+          const page = Number(req.query.page) || 1;
+          const pageSize = Number(req.query.size) || 10;
+          const { search } = req.query || "";
+          const totalData = await prisma.route.count({
+            where: {
+              passenger: {
+                some: { passengerId: Number(id), approved: 1 },
+              },
+              destination: { contains: search?.toString() },
+            },
+          });
+          const totalPage = Math.ceil(totalData / pageSize);
           if (user?.role === "employee") {
             route = await prisma.route.findMany({
+              skip: (page - 1) * pageSize,
+              take: pageSize,
               where: {
                 passenger: {
-                  some: { passengerId: Number(id) },
+                  some: { passengerId: Number(id), approved: 1 },
                 },
+                destination: { contains: search?.toString() },
               },
               include: {
                 User: { select: { id: true, name: true } },
@@ -37,7 +52,9 @@ export default async function handler(
             });
           }
           if (route) {
-            res.status(200).json({ data: route });
+            res
+              .status(200)
+              .json({ data: route, meta: { totalData, totalPage } });
           }
           break;
         case "DELETE":

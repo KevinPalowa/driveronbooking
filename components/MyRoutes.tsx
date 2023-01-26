@@ -16,15 +16,18 @@ import { BsChevronLeft, BsChevronRight, BsThreeDots } from "react-icons/bs";
 import { useQuery } from "@tanstack/react-query";
 import { getMyRoutes } from "@/api/route";
 import { useUser } from "@/hooks/useUser";
+import useDebounce from "@/hooks/useDebounce";
 
 export default function MyRoutes() {
-  const [keyword, setKeyword] = useState("");
+  const [search, setSearch] = useState("");
   const [size, setSize] = useState(10);
   const [page, setPage] = useState(1);
+  const keywordDebounced = useDebounce(search);
   const { user } = useUser();
   const { data } = useQuery({
-    queryKey: ["myRoute"],
-    queryFn: () => getMyRoutes(user?.id!),
+    queryKey: ["myRoute", page, size, keywordDebounced],
+    queryFn: () =>
+      getMyRoutes({ id: user?.id!, size, page, search: keywordDebounced }),
   });
   return (
     <>
@@ -32,7 +35,7 @@ export default function MyRoutes() {
         <h1 className="text-xl font-bold text-farmatek-black ">Route List</h1>
 
         <div className="flex space-x-3">
-          <SearchInput onChange={(e) => setKeyword(e.target.value)} />
+          <SearchInput onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
       <ShowEntries setPage={setPage} setSize={setSize} />
