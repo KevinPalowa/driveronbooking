@@ -59,7 +59,6 @@ export default function ModalAddRoute({
     AddRouteBody
   >(addFunction);
   const handleSubmit = (e: AddRouteBody) => {
-    console.log(e);
     mutate(
       { ...e },
       {
