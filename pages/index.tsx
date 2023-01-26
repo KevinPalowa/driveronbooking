@@ -1,16 +1,16 @@
 import Button from "@/components/Button";
 import Input from "@/components/Input";
 import Image from "next/image";
-import { getCookie, setCookie } from "cookies-next";
+import { setCookie } from "cookies-next";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Logo from "../public/img/logo.png";
 import { useForm } from "react-hook-form";
 import Head from "next/head";
 import axios, { AxiosError } from "axios";
 import { useMutation } from "@tanstack/react-query";
 import { useUser } from "@/hooks/useUser";
-import { ButtonSpinner, Spinner } from "@chakra-ui/react";
+import { Spinner } from "@chakra-ui/react";
 export type LoginBody = { email: string; password: string };
 
 async function doLogin({ email, password }: LoginBody) {
@@ -80,7 +80,7 @@ export default function Login() {
             />
           </div>
           <Button className="w-full" disabled={isLoading}>
-            {isLoading ? <Spinner /> : "Login"}
+            {isLoading ? <Spinner size="sm" color="white" /> : "Login"}
           </Button>
         </form>
       </div>
