@@ -104,7 +104,6 @@ function RouterList({ role }: Props) {
     <>
       <div className="flex justify-between mb-5 ">
         <h1 className="text-xl font-bold text-farmatek-black ">Route List</h1>
-
         <div className="flex space-x-3">
           {role === "admin" && (
             <button
@@ -234,11 +233,11 @@ function RouterList({ role }: Props) {
             <Button
               colorScheme={"yellow"}
               onClick={() => {
+                onCloseRequest();
                 doRequest(
                   { routeId: dataToRequest?.id, passengerId: user?.id },
                   {
                     onSuccess: () => {
-                      onCloseRequest();
                       queryClient.invalidateQueries({ queryKey: ["route"] });
                       toast({
                         title: `Request success`,
@@ -246,12 +245,11 @@ function RouterList({ role }: Props) {
                         status: "success",
                       });
                     },
-                    onError: () => {
-                      onCloseRequest();
+                    onError: (e) => {
                       toast({
                         title: `Request failed`,
-                        description: `Failed request driver`,
-                        status: "success",
+                        description: e.response.data.error,
+                        status: "error",
                       });
                     },
                   }
