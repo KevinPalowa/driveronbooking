@@ -65,3 +65,9 @@ export async function addRoute({
     },
   });
 }
+
+export async function deleteRoute(id: number) {
+  return await prisma.route.delete({
+    where: { id: Number(id) },
+  });
+}

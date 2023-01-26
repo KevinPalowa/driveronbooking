@@ -2,7 +2,16 @@ import prisma from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
 import { Role } from "@/types/global";
+import { addUser, getUsers } from "@/controller/user";
+import Joi from "joi";
+import { AddUserBody } from "@/api/user";
 
+const userBodySchema = Joi.object({
+  name: Joi.string().required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+  role: Joi.string().required(),
+});
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<any>
@@ -16,7 +25,7 @@ export default async function handler(
         case "GET":
           const { search } = req.query || "";
           const { role } = req.query || "";
-          let drivers;
+          let users;
           const page = Number(req.query.page) || 1;
           const pageSize = Number(req.query.size) || 10;
           const totalData = await prisma.user.count({
@@ -29,33 +38,22 @@ export default async function handler(
             },
           });
           const totalPage = Math.ceil(totalData / pageSize);
-          drivers = await prisma.user.findMany({
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-            where: {
-              role: role as Role,
-              OR: [
-                { name: { contains: search as string } },
-                { email: { contains: search as string } },
-              ],
-            },
-            select: { id: true, email: true, name: true, role: true },
-          });
-
-          res
-            .status(200)
-            .json({ data: drivers, meta: { totalData, totalPage } });
+          users = await getUsers(
+            search as string,
+            page,
+            pageSize,
+            role as Role
+          );
+          res.status(200).json({ data: users, meta: { totalData, totalPage } });
           break;
 
         case "POST":
-          const { name, email, password, role: roleBody } = req.body;
-          const driver = await prisma.user.create({
-            data: { name, email, password, role: roleBody },
-          });
-          if (driver) {
-            res.status(201).json({ data: driver });
+          const { error, value } = userBodySchema.validate(req.body);
+          if (error) {
+            res.status(400).json({ message: error });
           } else {
-            res.status(400).json({ data: driver });
+            const driver = await addUser(value);
+            res.status(201).json({ data: driver });
           }
           break;
       }

@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
+import { deleteRoute } from "@/controller/route";
 
 export default async function handler(
   req: NextApiRequest,
@@ -58,12 +59,9 @@ export default async function handler(
           }
           break;
         case "DELETE":
-          const driver = await prisma.route.delete({
-            where: { id: Number(id) },
-          });
+          const driver = await deleteRoute(Number(id));
           if (driver) {
-            res.status(200).json({ meta: { message: "Delete success" } });
-            break;
+            res.status(204);
           }
           break;
       }
