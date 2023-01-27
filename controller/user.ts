@@ -50,3 +50,13 @@ export async function editUser(data: UserEditParams) {
     data: { email: data.email, name: data.name },
   });
 }
+
+export async function getUserById(id: number) {
+  return await prisma.user.findUnique({
+    where: { id },
+    include: {
+      RouteRequested: { include: { Route: { include: { User: true } } } },
+      routes: true,
+    },
+  });
+}

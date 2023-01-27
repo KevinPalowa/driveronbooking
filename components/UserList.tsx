@@ -24,6 +24,7 @@ import { addUser, deleteUser, editUser, getUser } from "@/api/user";
 import { Role } from "@/types/global";
 import ModalEditUser from "./modal/ModalEditUser";
 import { UserResponse } from "@/types/user";
+import Link from "next/link";
 type Props = {
   role: Role;
 };
@@ -117,7 +118,9 @@ function UserList({ role }: Props) {
                     <Td>{e.name}</Td>
                     <Td>{e.email}</Td>
                     <Td className="flex space-x-1">
-                      <AiOutlineEye size={20} />
+                      <Link href={`${role}/${e.id}`}>
+                        <AiOutlineEye size={20} />
+                      </Link>
                       <AiOutlineEdit
                         size={20}
                         className="cursor-pointer"

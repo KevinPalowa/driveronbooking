@@ -1,6 +1,6 @@
 import { api } from "@/lib/axios";
 import { Role, TBrowseData } from "@/types/global";
-import { UserResponse, UserEditParams } from "@/types/user";
+import { UserResponse, UserEditParams, UserDetailResponse } from "@/types/user";
 
 export type AddUserBody = {
   email: string;
@@ -42,5 +42,12 @@ export const getUser = async ({
   const data = await api.get(
     `/api/user?search=${search}&size=${size}&page=${page}&role=${role}`
   );
+  return data.data;
+};
+
+export const getUserById = async (
+  id: number
+): Promise<{ data: UserDetailResponse }> => {
+  const data = await api.get(`/api/user/${id}`);
   return data.data;
 };

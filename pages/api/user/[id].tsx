@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
-import { editUser } from "@/controller/user";
+import { editUser, getUserById } from "@/controller/user";
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,6 +14,10 @@ export default async function handler(
     const token = jwt.verify(authorization, process.env.JWT_SECRET!);
     if (token) {
       switch (req.method) {
+        case "GET":
+          const user = await getUserById(Number(id));
+          res.status(200).json({ data: user });
+          break;
         case "PATCH":
           const { email, name } = req.body;
           try {
