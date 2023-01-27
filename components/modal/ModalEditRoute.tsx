@@ -1,5 +1,5 @@
 import { getUser } from "@/api/user";
-import { AddRouteBody } from "@/types/route";
+import { AddRouteBody, RouteResponse } from "@/types/route";
 import {
   Button,
   Input,
@@ -17,28 +17,37 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 
 type Props = {
   isOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
-  addFunction: () => Promise<any>;
+  editFunction: (id: number, obj: AddRouteBody) => Promise<any>;
+  data: RouteResponse;
 };
 export default function ModalEditRoute({
   isOpen,
   onOpen,
   onClose,
-  addFunction,
+  data,
+  editFunction,
 }: Props) {
+  console.log(data);
   const queryClient = useQueryClient();
   const {
     register,
     handleSubmit: submit,
-    formState: { errors },
     reset,
-  } = useForm<AddRouteBody>();
+  } = useForm<AddRouteBody>({
+    values: {
+      capacity: data.capacity,
+      driverId: data.User.id,
+      estimation: data.estimation,
+      destination: data.destination,
+      departureTime: data.departureTime,
+    },
+  });
   const { data: dataDriver } = useQuery({
     queryKey: ["driver"],
     keepPreviousData: true,
@@ -53,11 +62,9 @@ export default function ModalEditRoute({
 
   const toast = useToast({ position: "top-right", isClosable: true });
 
-  const { mutate, error, isLoading, data } = useMutation<
-    any,
-    AxiosError<any>,
-    AddRouteBody
-  >(addFunction);
+  const { mutate } = useMutation<any, AxiosError<any>, AddRouteBody>((e) =>
+    editFunction(data.id, { ...e })
+  );
   const handleSubmit = (e: AddRouteBody) => {
     console.log(e);
     mutate(
@@ -69,8 +76,8 @@ export default function ModalEditRoute({
           onClose();
 
           toast({
-            title: `Route Added`,
-            description: `Successfully add route`,
+            title: `Route edited`,
+            description: `Successfully edit route`,
             status: "success",
           });
         },

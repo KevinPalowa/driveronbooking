@@ -8,6 +8,11 @@ export const addRoute = async (params: AddRouteBody) => {
   return data.data;
 };
 
+export const editRoute = async (id: number, params: AddRouteBody) => {
+  const data = await api.patch(`api/route/${id}`, { ...params });
+  return data.data;
+};
+
 export const deleteRoute = async (id: number | string) => {
   const data = await api.delete(`api/route/${id}`);
   return data.data;

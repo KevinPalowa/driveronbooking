@@ -15,3 +15,7 @@ export type TBrowseData<T> = {
 };
 
 export type Role = "admin" | "employee" | "driver";
+
+export type ErrorResponse = {
+  message: string;
+};

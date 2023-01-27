@@ -1,3 +1,4 @@
+import { ErrorResponse } from "@/types/global";
 import { UserResponse } from "@/types/user";
 import {
   Button,
@@ -48,8 +49,8 @@ export default function ModalEditDriver({
 
   const toast = useToast({ position: "top-right", isClosable: true });
 
-  const { mutate } = useMutation<any, AxiosError<any>, FormValue>((e) =>
-    editFunction({ ...e, id: dataToEdit.id })
+  const { mutate } = useMutation<any, AxiosError<ErrorResponse>, FormValue>(
+    (e) => editFunction({ ...e, id: dataToEdit.id })
   );
   const handleSubmit = (e: any) => {
     console.log(e);
@@ -67,7 +68,12 @@ export default function ModalEditDriver({
           });
         },
         onError: (e) => {
-          console.log(e);
+          onClose();
+          toast({
+            title: `Add ${name}  failure`,
+            description: e?.response?.data.message,
+            status: "error",
+          });
         },
       }
     );

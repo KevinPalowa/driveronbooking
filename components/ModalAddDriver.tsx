@@ -1,4 +1,5 @@
 import { AddUserBody } from "@/api/user";
+import { ErrorResponse } from "@/types/global";
 import {
   Button,
   Input,
@@ -41,13 +42,14 @@ export default function ModalAddDriver({
     register,
     handleSubmit: submit,
     formState: { errors },
+    reset,
   } = useForm<FormValue>();
 
   const toast = useToast({ position: "top-right", isClosable: true });
 
   const { mutate, error, isLoading, data } = useMutation<
     any,
-    AxiosError<any>,
+    AxiosError<ErrorResponse>,
     any
   >(addFunction);
   const handleSubmit = (e: any) => {
@@ -55,6 +57,7 @@ export default function ModalAddDriver({
       { ...e, role: name },
       {
         onSuccess: () => {
+          reset();
           queryClient.invalidateQueries({ queryKey: [name] });
           onClose();
 
@@ -65,7 +68,13 @@ export default function ModalAddDriver({
           });
         },
         onError: (e) => {
-          console.log(e);
+          reset();
+          onClose();
+          toast({
+            title: `Add ${name}  failure`,
+            description: e?.response?.data.message,
+            status: "error",
+          });
         },
       }
     );
