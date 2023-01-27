@@ -64,6 +64,21 @@ export default async function handler(
             res.status(204);
           }
           break;
+        case "PATCH":
+          const { capacity, destination, estimation, departureTime, driverId } =
+            req.body;
+          const editedRoute = await prisma.route.update({
+            where: { id: Number(id) },
+            data: {
+              capacity: Number(capacity),
+              destination,
+              estimation,
+              departureTime,
+              User: { connect: { id: Number(driverId) } },
+            },
+          });
+          res.status(200).json({ data: editedRoute });
+          break;
       }
     } else {
       res.status(400).json({ message: "Invalid JWT" });

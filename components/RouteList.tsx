@@ -27,19 +27,26 @@ import ShowEntries from "@/components/ShowEntries";
 import SearchInput from "@/components/SearchInput";
 import { BsChevronLeft, BsChevronRight, BsThreeDots } from "react-icons/bs";
 import { Role } from "@/types/global";
-import { addRoute, deleteRoute, getRoutes } from "@/api/route";
+import { addRoute, deleteRoute, editRoute, getRoutes } from "@/api/route";
 import { useUser } from "@/hooks/useUser";
 import { api } from "@/lib/axios";
 import ModalAddRoute from "./modal/ModalAddRoute";
 import { RouteResponse } from "@/types/route";
 import ModalDelete from "./ModalDelete";
+import ModalEditRoute from "./modal/ModalEditRoute";
 type Props = {
   role: Role;
 };
 function RouterList({ role }: Props) {
   const { user } = useUser();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenEdit,
+    onOpen: onOpenEdit,
+    onClose: onCloseEdit,
+  } = useDisclosure();
   const [idToAction, setIdtoAction] = useState<number | undefined>();
+  const [dataToEdit, setDataToEdit] = useState<RouteResponse>();
   const {
     isOpen: isOpenDelete,
     onOpen: onOpenDelete,
@@ -144,7 +151,15 @@ function RouterList({ role }: Props) {
                   ) : role === "admin" ? (
                     <>
                       <AiOutlineEye size={20} />
-                      <AiOutlineEdit size={20} />
+                      <AiOutlineEdit
+                        className="cursor-pointer"
+                        size={20}
+                        onClick={() => {
+                          setIdtoAction(e.id);
+                          setDataToEdit(e);
+                          onOpenEdit();
+                        }}
+                      />
                       <AiOutlineDelete
                         size={20}
                         onClick={() => {
@@ -205,6 +220,15 @@ function RouterList({ role }: Props) {
         pageCount={data?.meta?.totalPage as number}
         previousLabel={<BsChevronLeft />}
       />
+      {isOpenEdit && (
+        <ModalEditRoute
+          isOpen={isOpenEdit}
+          onClose={onCloseEdit}
+          onOpen={onOpenEdit}
+          editFunction={editRoute}
+          data={dataToEdit!}
+        />
+      )}
       <ModalAddRoute
         isOpen={isOpen}
         onClose={onClose}

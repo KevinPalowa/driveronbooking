@@ -52,8 +52,13 @@ export default async function handler(
           if (error) {
             res.status(400).json({ message: error });
           } else {
-            const driver = await addUser(value);
-            res.status(201).json({ data: driver });
+            try {
+              const driver = await addUser(value);
+              res.status(201).json({ data: driver });
+            } catch (error) {
+              console.log("debuggingg>>>>>>>>", error);
+              res.status(400).json({ message: error });
+            }
           }
           break;
       }

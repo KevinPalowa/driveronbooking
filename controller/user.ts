@@ -1,6 +1,7 @@
 import { AddUserBody } from "@/api/user";
 import prisma from "@/lib/prisma";
 import { Role } from "@/types/global";
+import { UserEditParams } from "@/types/user";
 export async function getUsers(
   search: string,
   page: number,
@@ -22,7 +23,30 @@ export async function getUsers(
 }
 
 export async function addUser({ name, email, password, role }: AddUserBody) {
+  const isExist = await prisma.user.findUnique({ where: { email } });
+  if (isExist) {
+    throw "Email already registered";
+  }
   return await prisma.user.create({
     data: { name, email, password, role },
+  });
+}
+
+export async function editUser(data: UserEditParams) {
+  const userIsExist = await prisma.user.findUnique({
+    where: { id: data.id },
+  });
+  const emailIsExist = await prisma.user.findUnique({
+    where: { email: data.email },
+  });
+  if (!userIsExist) {
+    throw "User not found";
+  } else if (emailIsExist && userIsExist.email !== data.email) {
+    throw "Email already registered";
+  }
+
+  return await prisma.user.update({
+    where: { id: Number(data.id) },
+    data: { email: data.email, name: data.name },
   });
 }

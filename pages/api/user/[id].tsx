@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { NextApiRequest, NextApiResponse } from "next";
 import jwt from "jsonwebtoken";
+import { editUser } from "@/controller/user";
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,18 +16,15 @@ export default async function handler(
       switch (req.method) {
         case "PATCH":
           const { email, name } = req.body;
-          const user = await prisma.user.findUnique({
-            where: { id: Number(id) },
-          });
-          if (user) {
-            const changedUser = await prisma.user.update({
-              where: { id: Number(id) },
-              data: { email, name },
-            });
+          try {
+            const changedUser = await editUser({ id: Number(id), email, name });
             res
               .status(200)
-              .json({ data: changedUser, meta: { message: "Delete success" } });
+              .json({ data: changedUser, meta: { message: "Edit success" } });
+          } catch (err) {
+            res.status(400).json({ message: err });
           }
+
           break;
         case "DELETE":
           const driver = await prisma.user.delete({
