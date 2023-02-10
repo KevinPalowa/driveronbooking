@@ -24,6 +24,8 @@ export default function Layout({ children }: Props) {
   const { user, logout } = useUser();
   const router = useRouter();
   const [show_sidebar, setShowSidebar] = useState(false);
+  const parts = router.asPath.split("/");
+  const result = "/" + parts[1];
   const sidebars: Sidebar[] = [
     {
       icon: <AiOutlineDashboard size={24} className="mr-4" />,
@@ -87,9 +89,7 @@ export default function Layout({ children }: Props) {
                   <Link legacyBehavior href={sidebar.href}>
                     <a
                       className={`flex items-center rounded-lg py-2 px-6 transition hover:font-semibold hover:opacity-100 ${
-                        router.asPath === sidebar.href
-                          ? "bg-primary"
-                          : "bg-white"
+                        result === sidebar.href ? "bg-primary" : "bg-white"
                       }`}
                     >
                       {sidebar.icon}

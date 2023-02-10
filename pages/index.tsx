@@ -39,12 +39,12 @@ export default function Login() {
     );
   }
   return (
-    <div className="bg-gray-900 w-full h-screen grid place-items-center">
+    <div className="bg-gray-900 w-full min-h-screen grid place-items-center">
       <Head>
         <title>Login Page</title>
       </Head>
       <Image src={Logo} alt="logo" className="w-64 mx-auto" />
-      <div className="p-10 bg-white rounded-lg w-5/12 space-y-5 shadow-lg">
+      <div className="p-10 bg-white rounded-lg w-10/12 lg:w-5/12 space-y-5 shadow-lg">
         {error && (
           <div className="text-red-500 bg-red-200 p-3 w-full">
             {error?.response?.data.meta.message}
