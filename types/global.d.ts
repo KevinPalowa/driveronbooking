@@ -11,7 +11,7 @@ export type TBrowseData<T> = {
     totalData: number;
     totalPage: number;
   };
-  data: [] | T;
+  data: T;
 };
 
 export type Role = "admin" | "employee" | "driver";

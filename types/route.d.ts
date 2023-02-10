@@ -1,3 +1,4 @@
+import { UserResponse } from "./user";
 export type RouteResponse = {
   id: number;
   destination: string;
@@ -18,3 +19,8 @@ export type AddRouteBody = {
   estimation: string;
   driverId: number;
 };
+export type RouteDetail = {
+  _count: { passenger: number };
+  User: UserResponse;
+  passenger: { User: UserResponse }[];
+} & Omit<RouteResponse, "passenger" | "status">;

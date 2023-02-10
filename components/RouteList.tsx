@@ -34,6 +34,7 @@ import ModalAddRoute from "./modal/ModalAddRoute";
 import { RouteResponse } from "@/types/route";
 import ModalDelete from "./ModalDelete";
 import ModalEditRoute from "./modal/ModalEditRoute";
+import Link from "next/link";
 type Props = {
   role: Role;
 };
@@ -150,7 +151,9 @@ function RouterList({ role }: Props) {
                     <Spinner />
                   ) : role === "admin" ? (
                     <>
-                      <AiOutlineEye size={20} />
+                      <Link href={`route/${e.id}`}>
+                        <AiOutlineEye size={20} />
+                      </Link>
                       <AiOutlineEdit
                         className="cursor-pointer"
                         size={20}

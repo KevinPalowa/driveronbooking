@@ -51,7 +51,19 @@ export default async function handler(
             route = await prisma.route.findMany({
               where: { driverId: Number(id) },
             });
+          } else if (user?.role === "admin") {
+            route = await prisma.route.findUnique({
+              where: { id: Number(id) },
+              include: {
+                passenger: {
+                  include: { User: { select: { name: true, email: true } } },
+                },
+                User: { select: { name: true } },
+                _count: true,
+              },
+            });
           }
+
           if (route) {
             res
               .status(200)
