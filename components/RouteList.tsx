@@ -138,73 +138,77 @@ function RouterList({ role }: Props) {
             </Tr>
           </Thead>
           <Tbody>
-            {data?.data.map((e) => (
-              <Tr key={e.id}>
-                <Td>{e.destination}</Td>
-                <Td>{e.departureTime}</Td>
-                <Td>{e.capacity}</Td>
-                <Td>{e.estimation}</Td>
-                <Td>{e?.User.name}</Td>
-                <Td className="flex space-x-1">
-                  {(isLoadingDelete && idToAction === e.id) ||
-                  (isLoadingRequest && idToAction === e.id) ? (
-                    <Spinner />
-                  ) : role === "admin" ? (
-                    <>
-                      <Link href={`route/${e.id}`}>
-                        <AiOutlineEye size={20} />
-                      </Link>
-                      <AiOutlineEdit
-                        className="cursor-pointer"
-                        size={20}
+            {!isLoading && isSuccess ? (
+              data?.data.map((e) => (
+                <Tr key={e.id}>
+                  <Td>{e.destination}</Td>
+                  <Td>{e.departureTime}</Td>
+                  <Td>{e.capacity}</Td>
+                  <Td>{e.estimation}</Td>
+                  <Td>{e?.User.name}</Td>
+                  <Td className="flex space-x-1">
+                    {(isLoadingDelete && idToAction === e.id) ||
+                    (isLoadingRequest && idToAction === e.id) ? (
+                      <Spinner />
+                    ) : role === "admin" ? (
+                      <>
+                        <Link href={`route/${e.id}`}>
+                          <AiOutlineEye size={20} />
+                        </Link>
+                        <AiOutlineEdit
+                          className="cursor-pointer"
+                          size={20}
+                          onClick={() => {
+                            setIdtoAction(e.id);
+                            setDataToEdit(e);
+                            onOpenEdit();
+                          }}
+                        />
+                        <AiOutlineDelete
+                          size={20}
+                          onClick={() => {
+                            setIdtoAction(e.id);
+                            onOpenDelete();
+                            setIdToDelete(e.id);
+                          }}
+                          className="cursor-pointer"
+                        />
+                      </>
+                    ) : (
+                      <Button
+                        size="sm"
+                        backgroundColor={`${
+                          e.status === 0
+                            ? "blue"
+                            : e.status === 1
+                            ? "green"
+                            : e.status === 2
+                            ? "red"
+                            : "#efdd41"
+                        }`}
+                        color={e.status !== null ? "white" : "black"}
                         onClick={() => {
                           setIdtoAction(e.id);
-                          setDataToEdit(e);
-                          onOpenEdit();
+                          setDataToRequest(e);
+                          onOpenRequest();
                         }}
-                      />
-                      <AiOutlineDelete
-                        size={20}
-                        onClick={() => {
-                          setIdtoAction(e.id);
-                          onOpenDelete();
-                          setIdToDelete(e.id);
-                        }}
-                        className="cursor-pointer"
-                      />
-                    </>
-                  ) : (
-                    <Button
-                      size="sm"
-                      backgroundColor={`${
-                        e.status === 0
-                          ? "blue"
+                        isDisabled={e.status !== null}
+                      >
+                        {e.status === 0
+                          ? "Wait to approve"
                           : e.status === 1
-                          ? "green"
+                          ? "Approved"
                           : e.status === 2
-                          ? "red"
-                          : "#efdd41"
-                      }`}
-                      color={e.status !== null ? "white" : "black"}
-                      onClick={() => {
-                        setIdtoAction(e.id);
-                        setDataToRequest(e);
-                        onOpenRequest();
-                      }}
-                      isDisabled={e.status !== null}
-                    >
-                      {e.status === 0
-                        ? "Wait to approve"
-                        : e.status === 1
-                        ? "Approved"
-                        : e.status === 2
-                        ? "Rejected"
-                        : "Request"}
-                    </Button>
-                  )}
-                </Td>
-              </Tr>
-            ))}
+                          ? "Rejected"
+                          : "Request"}
+                      </Button>
+                    )}
+                  </Td>
+                </Tr>
+              ))
+            ) : (
+              <p>Loading...</p>
+            )}
           </Tbody>
         </Table>
       </TableContainer>
